@@ -143,7 +143,7 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
               ],
             )
           ),
-    //      _form('LOGIN', _buttonActionr),
+
         ],
       ),
     );
