@@ -30,7 +30,7 @@ class AuthService{
     await _fAuth.signOut();
   }
 
-  Stream<UserCurent> get currentUser{
-    return _fAuth.authStateChanges().map((User? user) => user );
-  }
+  // Stream<UserCurent> get currentUser{
+  //   return _fAuth.authStateChanges().map((User? user) => user );
+  // }
 }
