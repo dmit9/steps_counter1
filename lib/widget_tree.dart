@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:steps_counter1/auth.dart';
-import 'package:steps_counter1/screens/home_page.dart';
 //import 'package:steps_counter1/screens/home.dart';
 import 'package:steps_counter1/screens/login_register_page.dart';
+import 'package:steps_counter1/screens/steps_page.dart';
 
 class WidgetTree extends StatefulWidget {
   const WidgetTree({super.key});
@@ -18,7 +18,7 @@ class _WidgetTreeState extends State<WidgetTree> {
       stream: Auth().authStateChanges,
       builder: (context, snapshot) {
         if(snapshot.hasData) {
-          return HomePage(); 
+          return const StepsCount();  //HomePage(); 
         } else {
           return const LoginPage();
         }

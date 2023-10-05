@@ -44,3 +44,12 @@ app.*.map.json
 /android/app/release
 lib/firebase_options.dart
 android/google-services .json
+ios/firebase_app_id_file.json
+.gitignore
+.gitignore
+macos/firebase_app_id_file.json
+.gitignore
+.gitignore
+ios/Runner/GoogleService-Info.plist
+android/app/google-services.json
+macos/Runner/GoogleService-Info.plist

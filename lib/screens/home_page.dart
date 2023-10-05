@@ -38,7 +38,7 @@ class HomePage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             _userUid(),
-            SizedBox(height: 20,),
+            const SizedBox(height: 20,),
             _signOutButton(),
           ],
         ),

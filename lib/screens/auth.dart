@@ -8,8 +8,8 @@ class AuthorizationPage extends StatefulWidget {
 }
 
 class _AuthorizationPageState extends State<AuthorizationPage> {
-  TextEditingController _emailController = TextEditingController();
-  TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
 
   late String _email;
   late String _password;
@@ -20,9 +20,9 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
 
     Widget _logo(){
       return Padding(
-        padding: EdgeInsets.only(top:30),
+        padding: const EdgeInsets.only(top:30),
         child: Container(
-          child: Align(
+          child: const Align(
             child: Text('STEPS COUNTER', style: TextStyle(fontSize: 35, fontWeight: FontWeight.bold, color: Colors.white),),
           ),
         ),
@@ -31,24 +31,24 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
 
     Widget _input(Icon icon, String hint, TextEditingController controller, bool obsecure){
       return Container(
-        padding: EdgeInsets.only(left: 20, right: 20),
+        padding: const EdgeInsets.only(left: 20, right: 20),
         child: TextField(
           controller: controller,
           obscureText: obsecure,
-          style: TextStyle(fontSize: 20, color: Colors.white),
+          style: const TextStyle(fontSize: 20, color: Colors.white),
           decoration: InputDecoration(
-            hintStyle: TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white30),
+            hintStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white30),
             hintText: hint,
-            focusedBorder: OutlineInputBorder(
+            focusedBorder: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.white54, width: 1)
             ),
-            enabledBorder: OutlineInputBorder(
+            enabledBorder: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.white54, width: 1)
             ),
             prefixIcon: Padding(
-              padding: EdgeInsets.only(left: 10, right: 10),
+              padding: const EdgeInsets.only(left: 10, right: 10),
               child: IconTheme(
-                data: IconThemeData(color: Colors.white),
+                data: const IconThemeData(color: Colors.white),
                 child: icon
                 ),
               )
@@ -57,7 +57,7 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
       );
     }
 
-    Widget _button(String text, void func()){
+    Widget _button(String text, void Function() func){
       return ElevatedButton(
         style: ElevatedButton.styleFrom(
           disabledForegroundColor: Colors.white.withOpacity(0.68),
@@ -72,21 +72,21 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
         );
     }
 
-    Widget _form(String label, void func()){
+    Widget _form(String label, void Function() func){
       return Column(
         children: <Widget>[
           Padding(
-            padding: EdgeInsets.only(bottom: 20, top: 10),
-            child: _input(Icon(Icons.email), "EMAIL", _emailController, false)
+            padding: const EdgeInsets.only(bottom: 20, top: 10),
+            child: _input(const Icon(Icons.email), "EMAIL", _emailController, false)
             ),
           Padding(
-            padding: EdgeInsets.only(bottom: 20),
-            child: _input(Icon(Icons.lock), "PASSWORD", _passwordController, true)
+            padding: const EdgeInsets.only(bottom: 20),
+            child: _input(const Icon(Icons.lock), "PASSWORD", _passwordController, true)
             ),
-          SizedBox(height: 20,),
+          const SizedBox(height: 20,),
           Padding(
-            padding: EdgeInsets.only(left: 20, right: 20),
-            child: Container(
+            padding: const EdgeInsets.only(left: 20, right: 20),
+            child: SizedBox(
               height: 50,
               width: MediaQuery.of(context).size.width,
               child: _button(label, func)
@@ -114,9 +114,9 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
               children: <Widget>[
                 _form('LOGIN', _buttonActionr),
                 Padding(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   child: GestureDetector(
-                    child: Text('Not registered yet? Register!', style: TextStyle(fontSize: 20, color: Colors.white30)),
+                    child: const Text('Not registered yet? Register!', style: TextStyle(fontSize: 20, color: Colors.white30)),
                     onTap:() {
                       setState(() {
                         showLogin = false;
@@ -130,9 +130,9 @@ class _AuthorizationPageState extends State<AuthorizationPage> {
               children: <Widget>[
                 _form('REGISTER', _buttonActionr),
                 Padding(
-                  padding: EdgeInsets.all(10),
+                  padding: const EdgeInsets.all(10),
                   child: GestureDetector(
-                    child: Text('Already registered ? Login!', style: TextStyle(fontSize: 20, color: Colors.white30)),
+                    child: const Text('Already registered ? Login!', style: TextStyle(fontSize: 20, color: Colors.white30)),
                     onTap:() {
                       setState(() {
                         showLogin = true;
