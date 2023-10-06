@@ -64,25 +64,9 @@ class _StepsCountState extends State<StepsCount> {
     });  
   }
 
-  
-  //  Widget _dbReadButton() {
-  //   return ElevatedButton(onPressed: 
-  //   //  dbRead,
-  //   dbRead,
-  //     child: Text('Read $todaySteps'),
-  //   );
-  // }
-
   void dbAdd(name, val) async{
     await  db.collection("users").doc("$userEmail").set({name:val}, SetOptions(merge: true));
   }
-
-  // Widget _dbAddButton() {
-  //   return ElevatedButton(onPressed: 
-  //     dbAdd,
-  //     child: Text('Login to $userEmail'),
-  //   );
-  // }
 
    Future<void> signOut() async {
     await Auth().signOut();
@@ -97,6 +81,7 @@ class _StepsCountState extends State<StepsCount> {
     super.initState();
     initPlatformState();
     dbReadtodaySteps();
+    dbReadsavedStepsCount();
   }
 
   void onStepCount(StepCount event) {
