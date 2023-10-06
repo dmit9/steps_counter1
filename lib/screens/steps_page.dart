@@ -23,10 +23,10 @@ class _StepsCountState extends State<StepsCount> {
   late Stream<PedestrianStatus> _pedestrianStatusStream;
 
   String _status = '?', _steps = '?';
-  late dynamic todaySteps = 0;
+  late var todaySteps = 0;
   late int savedStepsCount = 0;
   late int lastDaySaved = 0;
-  int todayDayNo = 0;
+  int todayDayNo = Jiffy.now().dayOfYear;
   final String _click = 'db';
   late int data = 77;
 
@@ -34,38 +34,55 @@ class _StepsCountState extends State<StepsCount> {
   
   final Stream<QuerySnapshot> dbsSnapshots = FirebaseFirestore.instance.collection('users').snapshots();
   FirebaseFirestore db = FirebaseFirestore.instance;
-   
 
-    dbRead() {
+  String name = 'todaySteps';
+  int value = 999; 
+
+
+    dbReadsavedStepsCount() {
+    db.collection("users").doc(userEmail).get().then((value) {
+      int text1 = value.get("savedStepsCount");
+      savedStepsCount = text1;
+ //     print(savedStepsCount);
+      return savedStepsCount;
+    });  
+  }
+  dbReadtodaySteps() {
     db.collection("users").doc(userEmail).get().then((value) {
       int text1 = value.get("todaySteps");
       todaySteps = text1;
-      print(todaySteps);
+ //     print(savedStepsCount);
       return todaySteps;
     });  
   }
+  dbReadlastDaySaved() {
+    db.collection("users").doc(userEmail).get().then((value) {
+      int text1 = value.get("lastDaySaved");
+      lastDaySaved = text1;
+ //     print(savedStepsCount);
+      return lastDaySaved;
+    });  
+  }
+
   
-   Widget _dbReadButton() {
-    return ElevatedButton(onPressed: 
-    //  dbRead,
-    dbRead,
-      child: Text('Read $todaySteps'),
-    );
+  //  Widget _dbReadButton() {
+  //   return ElevatedButton(onPressed: 
+  //   //  dbRead,
+  //   dbRead,
+  //     child: Text('Read $todaySteps'),
+  //   );
+  // }
+
+  void dbAdd(name, val) async{
+    await  db.collection("users").doc("$userEmail").set({name:val}, SetOptions(merge: true));
   }
 
-  String name = 'todaySteps';
-  int value = 999;
-
-  void dbAdd() async{
-    await  db.collection("users").doc("$userEmail").set({name:todaySteps}, SetOptions(merge: true));
-  }
-
-  Widget _dbAddButton() {
-    return ElevatedButton(onPressed: 
-      dbAdd,
-      child: Text('Login to $userEmail'),
-    );
-  }
+  // Widget _dbAddButton() {
+  //   return ElevatedButton(onPressed: 
+  //     dbAdd,
+  //     child: Text('Login to $userEmail'),
+  //   );
+  // }
 
    Future<void> signOut() async {
     await Auth().signOut();
@@ -79,6 +96,7 @@ class _StepsCountState extends State<StepsCount> {
   void initState() {
     super.initState();
     initPlatformState();
+    dbReadtodaySteps();
   }
 
   void onStepCount(StepCount event) {
@@ -124,38 +142,41 @@ class _StepsCountState extends State<StepsCount> {
   }
 
   Future<int> getTodaySteps(int value) async {
-    print(value);
-    dbAdd();
+ //   int todayDayNo = Jiffy.now().dayOfYear;
+    dbAdd('value', value);
+    dbReadsavedStepsCount();
 
     int todayDayNo = Jiffy.now().dayOfYear;
-    if (value < savedStepsCount) {
 
+    if (value < savedStepsCount) {
       savedStepsCount = 0;
-      setState(() {
-        savedStepsCount;
-      });
+      dbAdd('savedStepsCount', savedStepsCount);
     }
+
+    dbReadlastDaySaved();
 
     if (lastDaySaved< todayDayNo) {
       lastDaySaved = todayDayNo;
       savedStepsCount = value;
 
-      setState(() {
-        lastDaySaved;
-        savedStepsCount;
-      }); 
+      dbAdd('savedStepsCount', savedStepsCount);
+      dbAdd('lastDaySaved', lastDaySaved);
     }
 
     setState(() {
       todaySteps = value - savedStepsCount;
     });
+    dbAdd('todayDayNo', todayDayNo);
+    dbAdd('todaySteps', todaySteps);
     return todaySteps; // this is your daily steps value.
   }  
 
 
   @override 
   Widget build(BuildContext context) {
-    dbRead();
+    
+   // dbRead();
+    dbAdd('todayDayNo', todayDayNo);
 
     return MaterialApp(
       home: Scaffold(
@@ -166,73 +187,78 @@ class _StepsCountState extends State<StepsCount> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              _dbAddButton(),
-              _dbReadButton(),
+          //    _dbAddButton(),
+        //      _dbReadButton(),
     //          SizedBox(height: 20,),
-              _signOutButton(),
-              Container(
-                 height: 100,
-                 padding: const EdgeInsets.all(5),
-                child: StreamBuilder<QuerySnapshot>(
-                  stream: dbsSnapshots, 
-                  builder:(
-                    BuildContext context,
-                    AsyncSnapshot<QuerySnapshot> snapshot,
-                  ) { 
-                    if (snapshot.hasError) {
-                      return const Text('Something went wrong...');
-                    }
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Text('Loading');
-                    }
-                    final data = snapshot.requireData;
-                    return ListView.builder(
-                      itemCount: data.size,
-                      itemBuilder: (context, index) {
-                        return Text(
-                          '$userEmail ${data.docs[index]['todaySteps']} '
-                        );
-                      },
-                    );
-                  },
-                  ),
-              ),
-              const Text(
-                'Steps Taken',
-                style: TextStyle(fontSize: 20),
-              ),
-              Text(
-                _steps,
-                style: const TextStyle(fontSize: 20),
-              ),
+                Text(
+                 'Login as $userEmail',
+                 style: const TextStyle(fontSize: 20),
+                 ),
+                _signOutButton(),
+                SizedBox(height: 20,),
+              // Container(
+              //    height: 100,
+              //    padding: const EdgeInsets.all(5),
+              //   child: StreamBuilder<QuerySnapshot>(
+              //     stream: dbsSnapshots, 
+              //     builder:(
+              //       BuildContext context,
+              //       AsyncSnapshot<QuerySnapshot> snapshot,
+              //     ) { 
+              //       if (snapshot.hasError) {
+              //         return const Text('Something went wrong...');
+              //       }
+              //       if (snapshot.connectionState == ConnectionState.waiting) {
+              //         return const Text('Loading');
+              //       }
+              //       final data = snapshot.requireData;
+              //       return ListView.builder(
+              //         itemCount: data.size,
+              //         itemBuilder: (context, index) {
+              //           return Text(
+              //             '$userEmail ${data.docs[index]['todaySteps']} '
+              //           );
+              //         },
+              //       );
+              //     },
+              //     ),
+              // ),
+              // const Text(
+              //   'Steps Taken',
+              //   style: TextStyle(fontSize: 20),
+              // ),
+              // Text(
+              //   _steps,
+              //   style: const TextStyle(fontSize: 20),
+              // ),
               const Text(
                 'Tuday Steps',
-                style: TextStyle(fontSize: 20),
+                style: TextStyle(fontSize: 30),
               ),
               Text(
                 todaySteps.toString() ?? '0',
-                style: const TextStyle(fontSize: 20),
+                style: const TextStyle(fontSize: 50),
               ),
-              const Text(
-                'Tuday Now , Last Day',
-                style: TextStyle(fontSize: 20),
-              ),
-              Text(
-                todayDayNo.toString() ?? '0',
-                style: const TextStyle(fontSize: 20),
-              ),Text(
-                lastDaySaved.toString() ?? '0',
-                style: const TextStyle(fontSize: 20),
-              ),
+              // const Text(
+              //   'Tuday Now , Last Day',
+              //   style: TextStyle(fontSize: 20),
+              // ),
+              // Text(
+              //   todayDayNo.toString() ?? '0',
+              //   style: const TextStyle(fontSize: 20),
+              // ),Text(
+              //   lastDaySaved.toString() ?? '0',
+              //   style: const TextStyle(fontSize: 20),
+              // ),
 
               const Divider(
-                height: 10,
+                height: 20,
                 thickness: 0,
                 color: Colors.white,
               ),
               const Text(
                 'Pedestrian Status',
-                style: TextStyle(fontSize: 10),
+                style: TextStyle(fontSize: 20),
               ),
               Icon(
                 _status == 'walking'
@@ -240,14 +266,14 @@ class _StepsCountState extends State<StepsCount> {
                     : _status == 'stopped'
                         ? Icons.accessibility_new
                         : Icons.error,
-                size: 30,
+                size: 50,
               ),
               Center(
                 child: Text(
                   _status,
                   style: _status == 'walking' || _status == 'stopped'
-                      ? const TextStyle(fontSize: 20)
-                      : const TextStyle(fontSize: 20, color: Colors.red),
+                      ? const TextStyle(fontSize: 30)
+                      : const TextStyle(fontSize: 30, color: Colors.red),
                 ),
               )
             ],
