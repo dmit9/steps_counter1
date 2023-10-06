@@ -21,9 +21,9 @@ class StepsCount extends StatefulWidget {
 class _StepsCountState extends State<StepsCount> {
   late Stream<StepCount> _stepCountStream;
   late Stream<PedestrianStatus> _pedestrianStatusStream;
- // FirebaseFirestore db = FirebaseFirestore.instance;
+
   String _status = '?', _steps = '?';
-  late int todaySteps = 0;
+  late dynamic todaySteps = 0;
   late int savedStepsCount = 0;
   late int lastDaySaved = 0;
   int todayDayNo = 0;
@@ -34,30 +34,30 @@ class _StepsCountState extends State<StepsCount> {
   
   final Stream<QuerySnapshot> dbsSnapshots = FirebaseFirestore.instance.collection('users').snapshots();
   FirebaseFirestore db = FirebaseFirestore.instance;
+   
 
-  void dbRead() {
-  final docRef = db.collection("users").doc("$userEmail");
-    docRef.snapshots().listen(
-      (event) => print("current data: ${event.data()}"),
-      onError: (error) => print("Listen failed: $error"),
-    );
+    dbRead() {
+    db.collection("users").doc(userEmail).get().then((value) {
+      int text1 = value.get("todaySteps");
+      todaySteps = text1;
+      print(todaySteps);
+      return todaySteps;
+    });  
   }
-  void dbReadd() async {
-    var collection = db.collection("users"); 
-    var docSnapshot = await collection.doc(userEmail).get();
-    Map<String, dynamic> data = docSnapshot.data()!;
-      
-        print("${data['1']}, ${data['2']}");
-
-  }
+  
    Widget _dbReadButton() {
     return ElevatedButton(onPressed: 
-      dbReadd,
-      child: Text('Read'),
+    //  dbRead,
+    dbRead,
+      child: Text('Read $todaySteps'),
     );
   }
+
+  String name = 'todaySteps';
+  int value = 999;
+
   void dbAdd() async{
-    await  db.collection("users").doc("$userEmail").set({'1':11, '2':22}, SetOptions(merge: true));
+    await  db.collection("users").doc("$userEmail").set({name:todaySteps}, SetOptions(merge: true));
   }
 
   Widget _dbAddButton() {
@@ -74,14 +74,6 @@ class _StepsCountState extends State<StepsCount> {
     Widget _signOutButton() {
     return ElevatedButton(onPressed: signOut, child: const Text('Sign Out'),);
   }
-
-  // void dbRead() async {
-  //   await db.collection("use").get().then((event) {
-  //     for (var doc in event.docs) {
-  //       print("${doc.id} => ${doc.data()}");
-  //     }
-  //   });
-  // }
   
   @override
   void initState() {
@@ -94,8 +86,6 @@ class _StepsCountState extends State<StepsCount> {
     setState(() {
       _steps = event.steps.toString();   // кол-во шагов общее
       getTodaySteps(event.steps);
-      print(_steps);
- //     todaySteps = _steps as int;    
     });
   }
 
@@ -135,6 +125,7 @@ class _StepsCountState extends State<StepsCount> {
 
   Future<int> getTodaySteps(int value) async {
     print(value);
+    dbAdd();
 
     int todayDayNo = Jiffy.now().dayOfYear;
     if (value < savedStepsCount) {
@@ -164,15 +155,7 @@ class _StepsCountState extends State<StepsCount> {
 
   @override 
   Widget build(BuildContext context) {
-
-  //  Widget _DbButton() {
-  //   return TextButton(
-  //     onPressed: () {
-  //     dbRead;
-  //     dbAdd;
-  //   }, child: Text('DB $_i' ),
-  //   );
-  // }
+    dbRead();
 
     return MaterialApp(
       home: Scaffold(
@@ -207,7 +190,7 @@ class _StepsCountState extends State<StepsCount> {
                       itemCount: data.size,
                       itemBuilder: (context, index) {
                         return Text(
-                          'Data 1 ${data.docs[index]['1']} Data 2 ${data.docs[index]['2']}'
+                          '$userEmail ${data.docs[index]['todaySteps']} '
                         );
                       },
                     );
@@ -241,12 +224,7 @@ class _StepsCountState extends State<StepsCount> {
                 lastDaySaved.toString() ?? '0',
                 style: const TextStyle(fontSize: 20),
               ),
-              // TextButton(
-              //   onPressed: () {
-              //     _click = 'clicked';
-              //     db.collection("UserSteps").add(user);
-              //  }, child: Text('DB,  $_click' ),
-              // ),
+
               const Divider(
                 height: 10,
                 thickness: 0,
