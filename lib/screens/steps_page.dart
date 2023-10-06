@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:jiffy/jiffy.dart';
@@ -27,10 +28,44 @@ class _StepsCountState extends State<StepsCount> {
   late int lastDaySaved = 0;
   int todayDayNo = 0;
   final String _click = 'db';
-  int _i = 0;
+  late int data = 77;
+
+  late String? userEmail = FirebaseAuth.instance.currentUser!.email;
   
-  final Stream<QuerySnapshot> UserSteps = FirebaseFirestore.instance.collection('use').snapshots();
-  
+  final Stream<QuerySnapshot> dbsSnapshots = FirebaseFirestore.instance.collection('users').snapshots();
+  FirebaseFirestore db = FirebaseFirestore.instance;
+
+  void dbRead() {
+  final docRef = db.collection("users").doc("$userEmail");
+    docRef.snapshots().listen(
+      (event) => print("current data: ${event.data()}"),
+      onError: (error) => print("Listen failed: $error"),
+    );
+  }
+  void dbReadd() async {
+    var collection = db.collection("users"); 
+    var docSnapshot = await collection.doc(userEmail).get();
+    Map<String, dynamic> data = docSnapshot.data()!;
+      
+        print("${data['1']}, ${data['2']}");
+
+  }
+   Widget _dbReadButton() {
+    return ElevatedButton(onPressed: 
+      dbReadd,
+      child: Text('Read'),
+    );
+  }
+  void dbAdd() async{
+    await  db.collection("users").doc("$userEmail").set({'1':11, '2':22}, SetOptions(merge: true));
+  }
+
+  Widget _dbAddButton() {
+    return ElevatedButton(onPressed: 
+      dbAdd,
+      child: Text('Login to $userEmail'),
+    );
+  }
 
    Future<void> signOut() async {
     await Auth().signOut();
@@ -47,22 +82,7 @@ class _StepsCountState extends State<StepsCount> {
   //     }
   //   });
   // }
-
-  // final user = <String, dynamic>{
-  //  "email": "ddd@ddd.com",
-  //   "todayStep": 50,
-  //  "savedStepsCount": 40,
-  //  "lastDaySaved": 30,
-  //  "todayDayNo": 20,
-  // };
-
-  // void dbAdd() async{
-  //   _i= _i+1;
-  //   await db.collection("use").add(user).then((DocumentReference doc) =>
-  //   print('DocumentSnapshot added with ID: ${doc.id}'));
-  // }
   
-
   @override
   void initState() {
     super.initState();
@@ -163,14 +183,15 @@ class _StepsCountState extends State<StepsCount> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-    //          _DbButton(),
+              _dbAddButton(),
+              _dbReadButton(),
     //          SizedBox(height: 20,),
               _signOutButton(),
               Container(
                  height: 100,
                  padding: const EdgeInsets.all(5),
                 child: StreamBuilder<QuerySnapshot>(
-                  stream: UserSteps, 
+                  stream: dbsSnapshots, 
                   builder:(
                     BuildContext context,
                     AsyncSnapshot<QuerySnapshot> snapshot,
