@@ -157,13 +157,14 @@ class _StepsCountState extends State<StepsCount> {
     }
 
     todaySteps = value - savedStepsCount;
-
-    if (savedTtodaySteps > todaySteps) {
-      todaySteps = todaySteps + savedTtodaySteps;
-    }
+    
     if (savedTtodaySteps < todaySteps){
       savedTtodaySteps = todaySteps;
     }
+    else if (savedTtodaySteps > todaySteps) {
+      todaySteps = todaySteps + savedTtodaySteps;
+    }
+  
   
     dbAdd('todayDayNo', todayDayNo);
     dbAdd('todaySteps', todaySteps);
