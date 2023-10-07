@@ -26,6 +26,7 @@ class _StepsCountState extends State<StepsCount> {
   late var todaySteps = 0;
   late int savedStepsCount = 0;
   late int lastDaySaved = 0;
+  int savedTtodaySteps = 1;
   int todayDayNo = Jiffy.now().dayOfYear;
   final String _click = 'db';
   late int data = 77;
@@ -38,8 +39,15 @@ class _StepsCountState extends State<StepsCount> {
   String name = 'todaySteps';
   int value = 999; 
 
-
-    dbReadsavedStepsCount() {
+  dbReadsavedTtodaySteps() {
+    db.collection("users").doc(userEmail).get().then((value) {
+      int text1 = value.get("savedTtodaySteps");
+      savedTtodaySteps = text1;
+ //     print(savedStepsCount);
+      return savedTtodaySteps;
+    });  
+  }
+  dbReadsavedStepsCount() {
     db.collection("users").doc(userEmail).get().then((value) {
       int text1 = value.get("savedStepsCount");
       savedStepsCount = text1;
@@ -82,6 +90,7 @@ class _StepsCountState extends State<StepsCount> {
     initPlatformState();
     dbReadtodaySteps();
     dbReadsavedStepsCount();
+    dbReadsavedTtodaySteps();
   }
 
   void onStepCount(StepCount event) {
@@ -127,8 +136,7 @@ class _StepsCountState extends State<StepsCount> {
   }
 
   Future<int> getTodaySteps(int value) async {
- //   int todayDayNo = Jiffy.now().dayOfYear;
-    dbAdd('value', value);
+    
     dbReadsavedStepsCount();
 
     int todayDayNo = Jiffy.now().dayOfYear;
@@ -148,11 +156,18 @@ class _StepsCountState extends State<StepsCount> {
       dbAdd('lastDaySaved', lastDaySaved);
     }
 
-    setState(() {
-      todaySteps = value - savedStepsCount;
-    });
+    todaySteps = value - savedStepsCount;
+
+    if (savedTtodaySteps > todaySteps) {
+      todaySteps = todaySteps + savedTtodaySteps;
+    }
+    if (savedTtodaySteps < todaySteps){
+      savedTtodaySteps = todaySteps;
+    }
+  
     dbAdd('todayDayNo', todayDayNo);
     dbAdd('todaySteps', todaySteps);
+    dbAdd('savedTtodaySteps', savedTtodaySteps);
     return todaySteps; // this is your daily steps value.
   }  
 
